@@ -1,0 +1,43 @@
+﻿@model ProductModel
+
+@{
+    ViewData["Title"] = "Edit Product";
+}
+<h3>@ViewData["Title"]</h3>
+<hr/>
+<form action="Edit" method="post">
+    <div class="mb-3">
+        <label class="form-label">Id</label>
+        <input type="text" class="form-control" asp-for="Id" readonly/>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">*Title</label>
+        <input type="text" class="form-control" asp-for="Title" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">*Price</label>
+        <input type="number" class="form-control" asp-for="Price" />
+        <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">*Count</label>
+        <input type="number" class="form-control" asp-for="Count" />
+        <span asp-validation-for="Count" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Weight</label>
+        <input type="number" class="form-control" asp-for="Weight" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Production</label>
+        <input type="text" class="form-control" asp-for="Production" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Expiration</label>
+        <input type="date" class="form-control" asp-for="Expiration" />
+    </div>
+    <div class="d-grid">
+        <button type="submit" class="btn btn-success">Update product</button>
+    </div>
+</form>
