@@ -17,9 +17,10 @@ namespace Shop.Data
         {
             _configuration = configuration;
         }
-
         public IDbConnection CreateConnection()
             => new SqlConnection(_configuration.GetConnectionString("LocalConnection"));
+        public IDbConnection CreateMasterConnection()
+            => new SqlConnection(_configuration.GetConnectionString("LocalMasterConnection"));
 
         public IDbConnection CreateRemoteConnection()
             => new SqlConnection(_configuration.GetConnectionString("RemoteConnection"));
