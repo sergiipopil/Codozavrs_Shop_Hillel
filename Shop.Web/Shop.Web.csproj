@@ -20,8 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\CodoZavrs_ShopDapper\CodoZavrs_ShopDapper\Shop.Data\Shop.Data.csproj" />
+    <ProjectReference Include="..\Shop.Data\Shop.Data.csproj" />
   </ItemGroup>
+
 
   <ItemGroup>
     <Content Update="appsettings.json">
