@@ -1,0 +1,89 @@
+﻿
+
+----------------------11.10.2023 14:22:37----------------------
+
+Exception message:Value was either too large or too small for an Int32.
+StackTrace:   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, ReadOnlySpan`1 value, TypeCode type)
+   at System.Int32.Parse(String s)
+   at Shop.Classes.ShopMenu.SellerMenu() in C:\Users\User\Source\Repos\CodoZavrs_Shop111Logs\Classes\ShopMenu.cs:line 232
+
+
+----------------------16.10.2023 16:17:28----------------------
+
+Exception message:Requested value 'a' was not found.
+StackTrace:   at System.Enum.TryParseByName(RuntimeType enumType, ReadOnlySpan`1 value, Boolean ignoreCase, Boolean throwOnFailure, UInt64& result)
+   at System.Enum.TryParseInt32Enum(RuntimeType enumType, ReadOnlySpan`1 value, Int32 minInclusive, Int32 maxInclusive, Boolean ignoreCase, Boolean throwOnFailure, TypeCode type, Int32& result)
+   at System.Enum.TryParse[TEnum](ReadOnlySpan`1 value, Boolean ignoreCase, Boolean throwOnFailure, TEnum& result)
+   at System.Enum.TryParse[TEnum](String value, Boolean ignoreCase, Boolean throwOnFailure, TEnum& result)
+   at System.Enum.Parse[TEnum](String value, Boolean ignoreCase)
+   at System.Enum.Parse[TEnum](String value)
+   at Shop.Classes.ShopMenu.BuyerMenu() in C:\Users\Богдан\Desktop\C#\progect_shop\CodoZavrs_Shop\Classes\ShopMenu.cs:line 326
+
+
+----------------------16.10.2023 17:09:58----------------------
+
+Exception message:The input string 'a' was not in a correct format.
+StackTrace:   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, ReadOnlySpan`1 value, TypeCode type)
+   at System.Int32.Parse(String s)
+   at Shop.Classes.ShopMenu.BuyerMenu() in C:\Users\Богдан\Desktop\C#\progect_shop\CodoZavrs_Shop\Classes\ShopMenu.cs:line 388
+
+
+----------------------16.10.2023 17:09:58----------------------
+
+Exception message:The input string 'a' was not in a correct format.
+StackTrace:   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, ReadOnlySpan`1 value, TypeCode type)
+   at System.Int32.Parse(String s)
+   at Shop.Classes.ShopMenu.BuyerMenu() in C:\Users\Богдан\Desktop\C#\progect_shop\CodoZavrs_Shop\Classes\ShopMenu.cs:line 388
+
+
+----------------------16.10.2023 17:17:15----------------------
+
+Exception message:The input string 'd' was not in a correct format.
+StackTrace:   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, ReadOnlySpan`1 value, TypeCode type)
+   at System.Int32.Parse(String s)
+   at Shop.Classes.ShopMenu.BuyerMenu() in C:\Users\Богдан\Desktop\C#\progect_shop\CodoZavrs_Shop\Classes\ShopMenu.cs:line 367
+
+
+----------------------16.10.2023 17:19:03----------------------
+
+Exception message:The input string 'g' was not in a correct format.
+StackTrace:   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, ReadOnlySpan`1 value, TypeCode type)
+   at System.Int32.Parse(String s)
+   at Shop.Classes.ShopMenu.BuyerMenu() in C:\Users\Богдан\Desktop\C#\progect_shop\CodoZavrs_Shop\Classes\ShopMenu.cs:line 367
+
+
+----------------------16.10.2023 17:19:55----------------------
+
+Exception message:The input string 'h' was not in a correct format.
+StackTrace:   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, ReadOnlySpan`1 value, TypeCode type)
+   at System.Int32.Parse(String s)
+   at Shop.Classes.ShopMenu.BuyerMenu() in C:\Users\Богдан\Desktop\C#\progect_shop\CodoZavrs_Shop\Classes\ShopMenu.cs:line 367
+
+
+----------------------16.10.2023 17:27:15----------------------
+
+Exception message:The input string 'g' was not in a correct format.
+StackTrace:   at System.Number.ThrowOverflowOrFormatException(ParsingStatus status, ReadOnlySpan`1 value, TypeCode type)
+   at System.Int32.Parse(String s)
+   at Shop.Classes.CustomerManager.BuyProduct(ProductManager product) in C:\Users\Богдан\Desktop\C#\progect_shop\CodoZavrs_Shop\Classes\CustomerManager.cs:line 56
+   at Shop.Classes.ShopMenu.BuyerMenu() in C:\Users\Богдан\Desktop\C#\progect_shop\CodoZavrs_Shop\Classes\ShopMenu.cs:line 364
+
+
+----------------------16.10.2023 17:29:01----------------------
+
+Exception message:Must specify valid information for parsing in the string. (Parameter 'value')
+StackTrace:   at System.Enum.TryParse[TEnum](ReadOnlySpan`1 value, Boolean ignoreCase, Boolean throwOnFailure, TEnum& result)
+   at System.Enum.TryParse[TEnum](String value, Boolean ignoreCase, Boolean throwOnFailure, TEnum& result)
+   at System.Enum.Parse[TEnum](String value, Boolean ignoreCase)
+   at System.Enum.Parse[TEnum](String value)
+   at Shop.Classes.ShopMenu.BuyerMenu() in C:\Users\Богдан\Desktop\C#\progect_shop\CodoZavrs_Shop\Classes\ShopMenu.cs:line 326
+
+
+----------------------16.10.2023 17:34:42----------------------
+
+Exception message:Must specify valid information for parsing in the string. (Parameter 'value')
+StackTrace:   at System.Enum.TryParse[TEnum](ReadOnlySpan`1 value, Boolean ignoreCase, Boolean throwOnFailure, TEnum& result)
+   at System.Enum.TryParse[TEnum](String value, Boolean ignoreCase, Boolean throwOnFailure, TEnum& result)
+   at System.Enum.Parse[TEnum](String value, Boolean ignoreCase)
+   at System.Enum.Parse[TEnum](String value)
+   at Shop.Classes.ShopMenu.BuyerMenu() in C:\Users\Богдан\Desktop\C#\progect_shop\CodoZavrs_Shop\Classes\ShopMenu.cs:line 326
