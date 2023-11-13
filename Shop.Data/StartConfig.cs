@@ -1,10 +1,12 @@
 ﻿using System.Reflection;
 using FluentMigrator.Runner;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Shop.Data;
 
 namespace Shop.Web
 {
-    public static class StartUp
+    public static class StartConfig
     {
         private static IConfigurationRoot config;
         public static DatabaseContext _dbContext;
