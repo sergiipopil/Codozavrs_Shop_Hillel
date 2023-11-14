@@ -1,99 +1,75 @@
 ﻿using Newtonsoft.Json;
+using PhoneNumbers;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dapper;
 
 namespace Shop.Login.Forms.BackLogic
 {
     public class RegistrationLogic
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
+        private readonly string connectionString;
+
         public string Password { get; set; }
-        public string PhoneNumber { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string DateofBirth { get; set; }
 
-        private static readonly List<RegistrationLogic> users = new List<RegistrationLogic>();
-
-        public string Notification { get; set; }
-
-        public RegistrationLogic() { }
-
-        public RegistrationLogic(string firstName, string lastName, string email, string password, string phoneNumber)
+        public RegistrationLogic() 
         {
-            FirstName = firstName;
-            LastName = lastName;
+            
+        }
+
+        public RegistrationLogic(string name, string email, string password, string dataofBirth)
+        {
+            Password = password;
+            Name = name;
             Email = email;
             Password = password;
-            PhoneNumber = phoneNumber;
+            DateofBirth = dataofBirth;
         }
 
         public void SaveUserData()
         {
             try
             {
-                var user = new
+                string publicConnectionString = "Data Source=.\\sqlexpress;Initial Catalog=Hyllel_Migrations;Integrated Security=True";
+
+                using (var connection = new SqlConnection(publicConnectionString))
                 {
-                    FirstName,
-                    LastName,
-                    Email,
-                    Password,
-                    PhoneNumber
-                };
+                    connection.Open();
 
-                string json = JsonConvert.SerializeObject(user);
+                    // Вызов хранимой процедуры для вставки пользователя
+                    connection.Execute("dbo.CreateUser",
+                        new
+                        {
+                            Password,
+                            Name,
+                            Email,
+                            DateofBirth
+                        },
+                        commandType: CommandType.StoredProcedure);
 
-                if (!File.Exists("UserData.json"))
-                {
-                    File.WriteAllText("UserData.json", "[" + json + "]");
-                    Console.WriteLine("Data saved successfully");
-                }
-                else
-                {
-                    string jsonFromFile = File.ReadAllText("UserData.json");
-                    List<RegistrationLogic> userList = JsonConvert.DeserializeObject<List<RegistrationLogic>>(jsonFromFile);
+                    Console.WriteLine("Data appended successfully");
 
-                    if (userList.Any(u => u.Email == Email))
-                    {
-                        Console.WriteLine("User with this email already exists.");
-                    }
-                    else
-                    {
-                        userList.Add(new RegistrationLogic(FirstName, LastName, Email, Password, PhoneNumber));
-                        string updatedJson = JsonConvert.SerializeObject(userList, Newtonsoft.Json.Formatting.Indented);
-                        File.WriteAllText("UserData.json", updatedJson);
-                        Console.WriteLine("Data appended successfully");
-                    }
+                    // Вывод данных из базы
 
+                    var userList = connection.Query<RegistrationLogic>("SELECT Name, Email FROM SignupTableMigration").ToList();
                     userList.ForEach(u =>
                     {
-                        Console.WriteLine("Data from user.json:");
-                        Console.WriteLine($"Name: {u.FirstName}");
-                        Console.WriteLine($"Ilchenko: {u.Email}");
+                        Console.WriteLine("Data from SignupTableMigration:");
+                        Console.WriteLine($"Name: {u.Name}, Email: {u.Email}");
                     });
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred, please try later: {ex.Message}");
-            }
-        }
-
-        public string GetUserData(string value)
-        {
-            Console.WriteLine($"Please enter your {value}");
-            return Console.ReadLine();
-        }
-
-        public static List<RegistrationLogic> GetUsers() => users;
-
-        public void PrintUsers()
-        {
-            foreach (var user in users)
-            {
-                Console.WriteLine($"Name: {user.FirstName}, Email: {user.Email}");
             }
         }
     }

@@ -1,77 +1,59 @@
-﻿using Newtonsoft.Json;
+﻿using Dapper;
 using System;
-using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Shop.Login.Inheritances;
-using Shop.Login.Forms.BackLogic.Validation;
 
 namespace Shop.Login.Forms.BackLogic
 {
-    internal abstract class LoginLogic : JsonFiles
+    internal class LoginLogic
     {
-        public static bool TryLogin(string firstName, string password)
+        private const string connectionString = "Data Source=.\\sqlexpress;Initial Catalog=Hyllel_Migrations;Integrated Security=True";
+
+        public static bool TryLogin(string name, string password)
         {
             try
             {
-                if (!File.Exists(FileName))
+                using (var connection = new SqlConnection(connectionString))
                 {
-                    throw new FileNotFoundException($"File {FileName} not found.");
+                    connection.Open();
+
+                    var userList = connection.Query<RegistrationLogic>("SELECT * FROM SignUpTable").ToList();
+
+                    RegistrationLogic user = userList.Find(u =>
+                        u.Name == name &&
+                        u.Password == password
+                    );
+
+                    return user != null;
                 }
-
-                string jsonFromFile = File.ReadAllText(FileName);
-                List<RegistrationLogic> userList = JsonConvert.DeserializeObject<List<RegistrationLogic>>(jsonFromFile);
-
-                RegistrationLogic user = userList.Find(u =>
-                    (u.FirstName == firstName || u.PhoneNumber == firstName) &&
-                    u.Password == password
-                );
-                // RegistrationLogic user = userList.Find(u => u.FirstName == firstName && u.Password == password);
-
-                return user != null;
-            }
-            catch (FileNotFoundException ex)
-            {
-                Console.WriteLine("An exception occurred: " + ex.Message);
-                Console.WriteLine("Call stack:");
-                Console.WriteLine(ex.StackTrace);
-                SaveStackTrace(ex.StackTrace);
-                return false;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred: {ex.Message}");
-                SaveStackTrace(ex.StackTrace);
                 return false;
             }
         }
 
-        public static bool TryLogin(string firstName)
+        public static bool TryLoginWithDapper(string name, string password)
         {
-            return TryLogin(firstName, "");
-        }
-
-        public abstract string GetNewPassword(string password);
-
-        public abstract string AdditionalProperty { get; }
-
-        private static void SaveStackTrace(string stackTrace)
-        {
-            string fileName = "StackTraceLog.txt";
-
             try
             {
-                if (!File.Exists(fileName))
+                using (var connection = new SqlConnection(connectionString))
                 {
-                    using (FileStream fs = File.Create(fileName)) { }
-                }
+                    connection.Open();
 
-                File.WriteAllText(fileName, stackTrace);
+                    // Using Dapper to execute a parameterized query
+                    var query = "SELECT * FROM SignUpTable WHERE Name = @Name AND Password = @Password";
+                    var parameters = new { Name = name, Password = password };
+                    var user = connection.QueryFirstOrDefault<RegistrationLogic>(query, parameters);
+
+                    return user != null;
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while saving the stack trace: {ex.Message}");
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return false;
             }
         }
     }

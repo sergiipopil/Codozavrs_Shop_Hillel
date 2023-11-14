@@ -1,145 +1,137 @@
-﻿using Shop.Login.Extensions;
-using Shop.Login.Forms.BackLogic.AdditionalLogic;
-using Shop.Login.Forms.BackLogic;
+﻿using Dapper;
 using System;
-using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Shop.Login.Forms.BackLogic.Validation;
-
 
 namespace Shop.Login.Forms
 {
-    public record UserInfo(string FirstName, string Password);
-
     public class LoginForm
     {
-        private const int MaxAttempts = 3;
-        private readonly int MaxAttemptsForReset = 5;
+        private const string ConnectionString = "Data Source=.\\sqlexpress;Initial Catalog=Hyllel_Migrations;Integrated Security=True";
 
-        private const int NewMaxAttempts = 3;
-
-        private int attempts;
-        private int newAttempts;
-
-        public LoginForm()
+        public bool TryLogin()
         {
-            attempts = MaxAttempts;
-            newAttempts = NewMaxAttempts;
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+
+                do
+                {
+                    Console.WriteLine("Enter your first name:");
+                    string firstName = Console.ReadLine();
+
+                    Console.WriteLine("Enter your password:");
+                    string password = Console.ReadLine();
+
+                    if (TryLogin(firstName, password, connection))
+                    {
+                        Console.WriteLine($"Login successful. Hello {firstName}");
+
+                        Console.WriteLine("Would you like to change your password or username \"password / username\"?");
+                        string userPassword = Console.ReadLine();
+
+                        if (userPassword == "password")
+                        {
+                            ResetPassword(firstName, connection);
+                        }
+
+                        if (userPassword == "username")
+                        {
+                            ResetUserName(firstName, connection);
+                        }
+
+                        return true;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Login failed. Try again.");
+                    }
+                } while (true);
+            }
+        }
+
+        public class UserInfo
+        {
+            public string Name { get; set; }
+            public string Password { get; set; }
+        }
+
+        private bool TryLogin(string firstName, string password, SqlConnection connection)
+        {
+            var user = connection.QueryFirstOrDefault<UserInfo>("SELECT Name, Password FROM SignupTableMigration WHERE Name = @Name AND Password = @Password",
+                new { Name = firstName, Password = password });
+
+            return user != null;
+        }
+
+        private void ResetPassword(string firstName, SqlConnection connection)
+        {
+            const int MaxAttemptsForReset = 5;
+
+            for (int resetAttempts = MaxAttemptsForReset; resetAttempts > 0; resetAttempts--)
+            {
+                string newPassword;
+                do
+                {
+                    Console.WriteLine("Enter your new password: ");
+                    newPassword = Console.ReadLine();
+                } while (!IsValidPassword(newPassword));
+
+                var parameters = new
+                {
+                    NewPassword = newPassword,
+                    UserId = firstName
+                };
+
+                int rowsAffected = connection.Execute("UPDATE SignupTableMigration SET Password = @NewPassword WHERE Name = @UserId", parameters);
+
+
+                if (rowsAffected > 0)
+                {
+                    Console.WriteLine($"Password for user {firstName} has been reset.");
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine($"Password reset failed. You still have {resetAttempts - 1} chance(s)");
+                }
+            }
+        }
+
+        private void ResetUserName(string firstName, SqlConnection connection)
+        {
+            const int MaxAttemptsForReset = 5;
+
+            for (int resetAttempts = MaxAttemptsForReset; resetAttempts > 0; resetAttempts--)
+            {
+                string newName;
+                Console.WriteLine("Enter your new name: ");
+                newName = Console.ReadLine();
+
+                var parameters = new
+                {
+                    NewName = newName,
+                    UserId = firstName
+                };
+
+                int rowsAffected = connection.Execute("UPDATE SignupTableMigration SET Name = @NewName WHERE Name = @UserId", parameters);
+
+                if (rowsAffected > 0)
+                {
+                    Console.WriteLine($"Name for user {firstName} has been reset.");
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine($"Name reset failed. You still have {resetAttempts - 1} chance(s)");
+                }
+            }
         }
 
         private static bool IsValidPassword(string password)
         {
-            return !string.IsNullOrEmpty(password) && ValidationHelper.IsValidPassword(password);
-        }
-
-
-
-        public bool TryLogin()
-        {
-            do
-            {
-                Console.WriteLine("Enter your first name:");
-                string firstName = Console.ReadLine();
-
-                Console.WriteLine("Enter your password:");
-                string password = Console.ReadLine();
-
-                if (LoginLogic.TryLogin(firstName, password))
-                {
-                    var fullNameConst = $"{firstName} Your password was right: {password}";
-                    Console.WriteLine($"Login successful. Hello {fullNameConst}");
-
-                    Console.WriteLine("Would you like to change your password or username \"password / username\"?");
-                    string userPassword = Console.ReadLine();
-
-                    if (userPassword == "password")
-                    {
-                        for (int resetAttempts = MaxAttemptsForReset; resetAttempts > 0; resetAttempts--)
-                        {
-                            string newPassword;
-                            do
-                            {
-                                Console.WriteLine("Enter your password: ");
-                                newPassword = Console.ReadLine();
-                            } while (!IsValidPassword(newPassword));
-
-                            var logic = new PasswordResetLogic();
-                            bool success = PasswordResetLogic.ResetPassword(firstName, newPassword);
-
-                            if (success)
-                            {
-                                Console.WriteLine($"Password for user {firstName} has been reset.");
-                                string userPasswordAdd = logic.GetNewPassword(newPassword);
-                                Console.WriteLine($"AdditionalProperty: {firstName}, {logic.AdditionalProperty}");
-                                break;
-                            }
-                            else
-                            {
-                                Console.WriteLine($"Your passwords do not match, you still have {resetAttempts - 1} chance(s)");
-                            }
-
-                        }
-                    }
-
-                    if (userPassword == "username")
-                    {
-                        for (int resetAttempts = MaxAttemptsForReset; resetAttempts > 0; resetAttempts--)
-                        {
-                            string newName;
-                            Console.WriteLine("Enter your name: ");
-                            newName = Console.ReadLine();
-
-                            var logic = new NameResetLogic();
-                            bool success = NameResetLogic.ResetUserName(firstName, newName);
-
-                            if (success)
-                            {
-                                Console.WriteLine($"Name for user {firstName} has been reset.");
-                                string userPasswordAdd = logic.GetNewPassword(newName);
-                                Console.WriteLine($"AdditionalProperty: {firstName}, {logic.AdditionalProperty}");
-                                break;
-                            }
-                            else
-                            {
-                                Console.WriteLine($"Your passwords do not match, you still have {resetAttempts - 1} chance(s)");
-                            }
-                        }
-                    }
-
-                    return true;
-                }
-                else
-                {
-                    attempts--;
-                    if (attempts > 0)
-                    {
-                        Console.WriteLine($"You have {attempts} attempts remaining.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Login failed. Try again later.");
-                    }
-                }
-            } while (attempts > 0);
-
-            return false;
-        }
-
-
-        public bool TryLogin(string firstName, string password)
-        {
-            attempts = MaxAttempts;
-
-            LoginLogic.TryLogin(firstName, password);
-
-            return true;
-        }
-
-        public void ResetAttempts()
-        {
-            attempts = MaxAttemptsForReset;
+            // Ваша логика проверки пароля
+            return !string.IsNullOrEmpty(password);
         }
     }
 }

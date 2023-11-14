@@ -8,6 +8,7 @@
     
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="FluentMigrator.Runner" Version="3.3.2" />
     <PackageReference Include="libphonenumber-csharp" Version="8.13.22" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>

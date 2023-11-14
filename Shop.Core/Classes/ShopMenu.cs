@@ -185,6 +185,7 @@ namespace Shop.Classes
                     case AppMode.Loggin:
                         Login.Forms.LoginForm userLoggin = new Login.Forms.LoginForm();
                         userLoggin.TryLogin();
+                        Console.WriteLine("Login Logic");
                         break;
 
                     case AppMode.SearchProduct:
