@@ -14,6 +14,7 @@ using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
 using FluentMigrator;
 using Microsoft.Extensions.Configuration;
+using Shop.Login.Connection;
 
 namespace Shop.Login.Forms
 {
@@ -22,64 +23,17 @@ namespace Shop.Login.Forms
     {
         private const int MaxAttempts = 3;
 
-        private IConfiguration configuration;
-        private static string connectionString;
-
-
-        public RegistrationForm()
-        {
-            configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
-
-            connectionString = configuration.GetConnectionString("DefaultConnection");
-        }
-
-        // Проверка на существование "appsettings.json"
-        private void InitializeConfiguration()
-        {
-            var configBuilder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-
-            configuration = configBuilder.Build();
-
-            if (!File.Exists("appsettings.json"))
-            {
-                CreateDefaultAppSettings();
-            }
-        }
-
-        private void CreateDefaultAppSettings()
-        {
-            string defaultContent = @"
-            {
-              ""ConnectionStrings"": {
-                ""DefaultConnection"": ""Data Source=.\\sqlexpress;Initial Catalog=Hyllel_Migrations;Integrated Security=True""
-              }
-            }";
-
-            File.WriteAllText("appsettings.json", defaultContent);
-            Console.WriteLine("appsettings.json file created with default content.");
-        }
-
-
         public void NewRegistrationForm()
         {
             int attempts = MaxAttempts;
 
             var serviceProvider = CreateServices();
 
-            // Применение миграций
             using (var scope = serviceProvider.CreateScope())
             {
                 UpdateDatabase(scope.ServiceProvider);
             }
 
-            InitializeConfiguration();
-
-            //Код программы
             string userName = ValidationHelper.GetValidInput("First Name", ValidationHelper.IsValidUserName);
 
             string userEmail = ValidationHelper.GetValidInput("Email", ValidationHelper.IsValidUserEmail);
@@ -104,7 +58,7 @@ namespace Shop.Login.Forms
                     password: userPassword,
                     dataofBirth: userDateofBirth
                 );
-                user.SaveUserData();
+                user.SaveUserData(userName, userEmail, userPassword, userDateofBirth);
             }
             else
             {
@@ -116,11 +70,13 @@ namespace Shop.Login.Forms
 
         private static IServiceProvider CreateServices()
         {
+            string databaseConnection = CommonUtility.GetDatabaseConnectionString();
+
             return new ServiceCollection()
                 .AddFluentMigratorCore()
                 .ConfigureRunner(rb => rb
                     .AddSqlServer()
-                    .WithGlobalConnectionString(connectionString)
+                    .WithGlobalConnectionString(databaseConnection)
                     .ScanIn(typeof(Program).Assembly).For.Migrations())
                 .AddLogging(lb => lb.AddFluentMigratorConsole())
                 .BuildServiceProvider(false);

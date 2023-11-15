@@ -1,17 +1,22 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Configuration;
+using Shop.Login.Connection;
 using System;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Security.Policy;
 
 namespace Shop.Login.Forms
 {
     public class LoginForm
     {
-        private const string ConnectionString = "Data Source=.\\sqlexpress;Initial Catalog=Hyllel_Migrations;Integrated Security=True";
-
         public bool TryLogin()
         {
-            using (var connection = new SqlConnection(ConnectionString))
+            string databaseConnection = CommonUtility.GetDatabaseConnectionString();
+
+            string connectionString = databaseConnection;
+
+            using (var connection = new SqlConnection(databaseConnection))
             {
                 connection.Open();
 
@@ -58,7 +63,8 @@ namespace Shop.Login.Forms
 
         private bool TryLogin(string firstName, string password, SqlConnection connection)
         {
-            var user = connection.QueryFirstOrDefault<UserInfo>("SELECT Name, Password FROM SignupTableMigration WHERE Name = @Name AND Password = @Password",
+            var user = connection.QueryFirstOrDefault<UserInfo>(
+                "SELECT Name, Password FROM hillel.SignUpTable WHERE Name = @Name AND Password = @Password",
                 new { Name = firstName, Password = password });
 
             return user != null;
@@ -83,8 +89,9 @@ namespace Shop.Login.Forms
                     UserId = firstName
                 };
 
-                int rowsAffected = connection.Execute("UPDATE SignupTableMigration SET Password = @NewPassword WHERE Name = @UserId", parameters);
-
+                int rowsAffected = connection.Execute(
+                    "UPDATE hillel.SignupTableMigration SET Password = @NewPassword WHERE Name = @UserId",
+                    parameters);
 
                 if (rowsAffected > 0)
                 {
@@ -114,7 +121,9 @@ namespace Shop.Login.Forms
                     UserId = firstName
                 };
 
-                int rowsAffected = connection.Execute("UPDATE SignupTableMigration SET Name = @NewName WHERE Name = @UserId", parameters);
+                int rowsAffected = connection.Execute(
+                    "UPDATE hillel.SignupTableMigration SET Name = @NewName WHERE Name = @UserId",
+                    parameters);
 
                 if (rowsAffected > 0)
                 {

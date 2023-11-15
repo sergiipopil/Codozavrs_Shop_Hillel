@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
+using Microsoft.Extensions.Configuration;
+using Shop.Login.Connection;
 
 namespace Shop.Login.Forms.BackLogic
 {
@@ -20,10 +22,7 @@ namespace Shop.Login.Forms.BackLogic
         public string Email { get; set; }
         public string DateofBirth { get; set; }
 
-        public RegistrationLogic() 
-        {
-            
-        }
+        public RegistrationLogic() { }
 
         public RegistrationLogic(string name, string email, string password, string dataofBirth)
         {
@@ -34,43 +33,63 @@ namespace Shop.Login.Forms.BackLogic
             DateofBirth = dataofBirth;
         }
 
-        public void SaveUserData()
+        private string HashPassword(string password)
+        {
+            using (var sha256 = System.Security.Cryptography.SHA256.Create())
+            {
+                byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+            }
+        }
+
+        public void SaveUserData(string name, string email, string password, string dateOfBirth)
         {
             try
             {
-                string publicConnectionString = "Data Source=.\\sqlexpress;Initial Catalog=Hyllel_Migrations;Integrated Security=True";
+                if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(dateOfBirth))
+                {
+                    Console.WriteLine("Invalid input data");
+                    return;
+                }
 
-                using (var connection = new SqlConnection(publicConnectionString))
+                string databaseConnection = CommonUtility.GetDatabaseConnectionString();
+
+                using (var connection = new SqlConnection(databaseConnection))
                 {
                     connection.Open();
 
-                    // Вызов хранимой процедуры для вставки пользователя
-                    connection.Execute("dbo.CreateUser",
+                    // Хеширование пароля
+                    string hashedPassword = HashPassword(password);
+
+                    connection.Execute("hillel.CreateUser",
                         new
                         {
-                            Password,
-                            Name,
-                            Email,
-                            DateofBirth
+                            Password = hashedPassword,
+                            Name = name,
+                            Email = email,
+                            DateofBirth = dateOfBirth
                         },
                         commandType: CommandType.StoredProcedure);
 
                     Console.WriteLine("Data appended successfully");
 
-                    // Вывод данных из базы
-
-                    var userList = connection.Query<RegistrationLogic>("SELECT Name, Email FROM SignupTableMigration").ToList();
+                    var userList = connection.Query<RegistrationLogic>("SELECT Name, Email FROM hillel.SignUpTable").ToList();
                     userList.ForEach(u =>
                     {
-                        Console.WriteLine("Data from SignupTableMigration:");
+                        Console.WriteLine("Data from SignUpTable:");
                         Console.WriteLine($"Name: {u.Name}, Email: {u.Email}");
                     });
                 }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine($"SQL Exception: {ex.Message}");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred, please try later: {ex.Message}");
             }
         }
+
     }
 }

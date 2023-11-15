@@ -1,5 +1,5 @@
 ﻿using Shop.Classes;
 using Shop.Web;
 
-StartConfig.InitialConfig();
+//StartConfig.InitialConfig();
 ShopMenu shopMenu = new ShopMenu();
