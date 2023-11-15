@@ -45,7 +45,7 @@ namespace Shop.Web
                 .AddLogging(c => c.AddFluentMigratorConsole())
                 .AddFluentMigratorCore()
                 .ConfigureRunner(c => c.AddSqlServer2012()
-                    .WithGlobalConnectionString(config.GetConnectionString("LocalConnection"))
+                    .WithGlobalConnectionString(config.GetConnectionString("RemoteConnection"))
                     .ScanIn(Assembly.GetExecutingAssembly()).For.Migrations())
                 .BuildServiceProvider(false);
         }

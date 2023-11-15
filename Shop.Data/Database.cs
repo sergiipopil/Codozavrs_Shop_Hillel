@@ -16,7 +16,7 @@ namespace Shop.Data
             var parameters = new DynamicParameters();
             parameters.Add("name", dbName);
 
-            using (var connection = _context.CreateMasterConnection())
+            using (var connection = _context.CreateRemoteConnection())
             {
                 var records = connection.Query(query, parameters);
                 if (!records.Any())

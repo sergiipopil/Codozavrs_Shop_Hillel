@@ -33,8 +33,9 @@ namespace Shop.Data.Migrations
 	                            NumberPhone nvarchar(13) null,
 	                            BirhtDay datetime null,
 	                            Age int null,
-	                            Cash decimal(18,2) null,
-                            );
+	                            Cash decimal(18,2) null
+                            )
+                        END;
 ";
             Execute.Sql(sql);
         }
