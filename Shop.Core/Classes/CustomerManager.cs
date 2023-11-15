@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
+using Dapper;
 
 namespace Shop.Classes
 {
@@ -179,5 +181,101 @@ namespace Shop.Classes
 
             }
         }
+
+        public void GetCustomerById(int Id, string connectionStr)
+        {
+
+            using (var connection = new SqlConnection(connectionStr))
+            {
+                var sql = $@"EXEC hillel.GetCustomerById @Id={Id}";
+                var result = connection.Query<Customer>(sql);
+                foreach (var customer in result)
+                {
+                    Console.WriteLine($"Id: {customer.Id},Firstname: {customer.FirstName}, Lastname: {customer.LastName}");
+
+                }
+            }
+        }
+
+        public void CreateCustomer(Customer customer, string connectionStr)
+        {
+            using (var connection = new SqlConnection(connectionStr))
+            {
+                var parameters = new
+                {
+                    FirstName = customer.FirstName,
+                    LastName = customer.LastName,
+                    PhoneNumber = customer.PhoneNumber,
+                    BirthDay = customer.BirthDay,
+                    Age = customer.Age,
+                    Cash = customer.Cash
+                };
+
+                var sql = $@"EXEC hillel.CreateCustomer @FirstName = {parameters.FirstName}, @LastName={parameters.LastName}, @PhoneNumber={parameters.PhoneNumber},@BirthDay={parameters.BirthDay},@Age={parameters.Age},@Cash={parameters.Cash} ";
+
+                var result = connection.Execute(sql, parameters);
+            }
+        }
+
+        public void DeleteCustomer(int Id, string connectionStr)
+        {
+            using (var connection = new SqlConnection(connectionStr))
+            {
+                var sql = $@"EXEC hillel.DeleteCustomerById @Id={Id}";
+                var result = connection.Query(sql);
+            }
+        }
+
+        public void UpDateCustomerById(string connectionStr, int id, string firstName, string lastName, string phoneNumber, DateTime birthDay, int? age, int? cash)
+        {
+            using (var connection = new SqlConnection(connectionStr))
+            {
+                var parameters = new Dictionary<string, object>
+                {
+                    { "@ID", id }
+                };
+
+                var sql = "EXEC hillel.UpDateCustomerById @ID = @ID";
+
+                if (!string.IsNullOrEmpty(firstName))
+                {
+                    parameters.Add("@FirstName", firstName);
+                    sql += ", @FirstName = @FirstName";
+                }
+
+                if (!string.IsNullOrEmpty(lastName))
+                {
+                    parameters.Add("@LastName", lastName);
+                    sql += ", @LastName = @LastName";
+                }
+
+                if (!string.IsNullOrEmpty(phoneNumber))
+                {
+                    parameters.Add("@PhoneNumber", phoneNumber);
+                    sql += ", @PhoneNumber = @PhoneNumber";
+                }
+
+                if (birthDay != DateTime.MinValue)
+                {
+                    parameters.Add("@BirthDay", birthDay);
+                    sql += ", @BirthDay = @BirthDay";
+                }
+
+                if (age != null)
+                {
+                    parameters.Add("@Age", age);
+                    sql += ", @Age = @Age";
+                }
+
+                if (cash != null)
+                {
+                    parameters.Add("@Cash", cash);
+                    sql += ", @Cash = @Cash";
+                }
+
+                connection.Execute(sql, parameters);
+            }
+        }
+
     }
 }

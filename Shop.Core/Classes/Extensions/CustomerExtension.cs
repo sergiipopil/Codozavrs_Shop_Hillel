@@ -14,7 +14,7 @@ namespace Shop.Classes.Extensions
                $"Name - {customer.FirstName}\n" +
                $"Surname - {customer.LastName}\n" +
                $"Age - {customer.Age}\n" +
-               $"Phone number - {customer.NumberPhone}\n" +
+               $"Phone number - {customer.PhoneNumber}\n" +
                $"Customer cach - {customer.Cash}\n" +
                $"Customer discount % - {customerRecord.Discount}\n"
                );

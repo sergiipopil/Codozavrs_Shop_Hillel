@@ -36,8 +36,8 @@ namespace Shop.Classes
 
         private CustomerManager customerManager = new();
         private static CustomerRecord customerRecord = new(new DateTime(2002, 12, 01), 5);
-        private Customer customer = new Customer("Ivan", "Ivanchenko", 3806661177, 5000, customerRecord);
-        private CustomerAbstract customerUpCast = new Customer("Ivan", "Ivanchenko", 3806661177, 5000, customerRecord);
+        private Customer customer = new Customer("Ivan", "Ivanchenko", "+3806661177", 5000, customerRecord);
+        private CustomerAbstract customerUpCast = new Customer("Ivan", "Ivanchenko", "+3806661177", 5000, customerRecord);
 
         public ShopMenu()
         {

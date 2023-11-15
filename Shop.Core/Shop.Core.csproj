@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.21" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CustomerLogic\CustomerLogic.csproj" />
     <ProjectReference Include="..\Shop.LoginNewTestMark\Shop.Login.csproj" />
     <ProjectReference Include="..\Shop.Logs\Shop.Logs.csproj" />

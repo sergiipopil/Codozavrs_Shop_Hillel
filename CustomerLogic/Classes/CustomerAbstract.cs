@@ -14,11 +14,12 @@ namespace CustomerLogic.Classes
     public abstract class CustomerAbstract
     {
 
-
+        public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public required long NumberPhone { get; set; }
+        public string PhoneNumber { get; set; }
         public abstract int Age { get; }
+        public DateTime BirthDay { get; set; }
 
         public virtual string CustomerAdult()
         {
