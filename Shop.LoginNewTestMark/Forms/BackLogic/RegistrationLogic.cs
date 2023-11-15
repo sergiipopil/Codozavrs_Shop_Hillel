@@ -1,79 +1,89 @@
 ﻿using Newtonsoft.Json;
+using PhoneNumbers;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dapper;
+using Microsoft.Extensions.Configuration;
+using Shop.Login.Connection;
 
 namespace Shop.Login.Forms.BackLogic
 {
     public class RegistrationLogic
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
+        private readonly string connectionString;
+
         public string Password { get; set; }
-        public string PhoneNumber { get; set; }
-
-        private static readonly List<RegistrationLogic> users = new List<RegistrationLogic>();
-
-        public string Notification { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string DateofBirth { get; set; }
 
         public RegistrationLogic() { }
 
-        public RegistrationLogic(string firstName, string lastName, string email, string password, string phoneNumber)
+        public RegistrationLogic(string name, string email, string password, string dataofBirth)
         {
-            FirstName = firstName;
-            LastName = lastName;
+            Password = password;
+            Name = name;
             Email = email;
             Password = password;
-            PhoneNumber = phoneNumber;
+            DateofBirth = dataofBirth;
         }
 
-        public void SaveUserData()
+        private string HashPassword(string password)
+        {
+            using (var sha256 = System.Security.Cryptography.SHA256.Create())
+            {
+                byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+            }
+        }
+
+        public void SaveUserData(string name, string email, string password, string dateOfBirth)
         {
             try
             {
-                var user = new
+                if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(dateOfBirth))
                 {
-                    FirstName,
-                    LastName,
-                    Email,
-                    Password,
-                    PhoneNumber
-                };
-
-                string json = JsonConvert.SerializeObject(user);
-
-                if (!File.Exists("UserData.json"))
-                {
-                    File.WriteAllText("UserData.json", "[" + json + "]");
-                    Console.WriteLine("Data saved successfully");
+                    Console.WriteLine("Invalid input data");
+                    return;
                 }
-                else
+
+                string databaseConnection = CommonUtility.GetDatabaseConnectionString();
+
+                using (var connection = new SqlConnection(databaseConnection))
                 {
-                    string jsonFromFile = File.ReadAllText("UserData.json");
-                    List<RegistrationLogic> userList = JsonConvert.DeserializeObject<List<RegistrationLogic>>(jsonFromFile);
+                    connection.Open();
 
-                    if (userList.Any(u => u.Email == Email))
-                    {
-                        Console.WriteLine("User with this email already exists.");
-                    }
-                    else
-                    {
-                        userList.Add(new RegistrationLogic(FirstName, LastName, Email, Password, PhoneNumber));
-                        string updatedJson = JsonConvert.SerializeObject(userList, Newtonsoft.Json.Formatting.Indented);
-                        File.WriteAllText("UserData.json", updatedJson);
-                        Console.WriteLine("Data appended successfully");
-                    }
+                    // Хеширование пароля
+                    string hashedPassword = HashPassword(password);
 
+                    connection.Execute("hillel.CreateUser",
+                        new
+                        {
+                            Password = hashedPassword,
+                            Name = name,
+                            Email = email,
+                            DateofBirth = dateOfBirth
+                        },
+                        commandType: CommandType.StoredProcedure);
+
+                    Console.WriteLine("Data appended successfully");
+
+                    var userList = connection.Query<RegistrationLogic>("SELECT Name, Email FROM hillel.SignUpTable").ToList();
                     userList.ForEach(u =>
                     {
-                        Console.WriteLine("Data from user.json:");
-                        Console.WriteLine($"Name: {u.FirstName}");
-                        Console.WriteLine($"Ilchenko: {u.Email}");
+                        Console.WriteLine("Data from SignUpTable:");
+                        Console.WriteLine($"Name: {u.Name}, Email: {u.Email}");
                     });
                 }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine($"SQL Exception: {ex.Message}");
             }
             catch (Exception ex)
             {
@@ -81,20 +91,5 @@ namespace Shop.Login.Forms.BackLogic
             }
         }
 
-        public string GetUserData(string value)
-        {
-            Console.WriteLine($"Please enter your {value}");
-            return Console.ReadLine();
-        }
-
-        public static List<RegistrationLogic> GetUsers() => users;
-
-        public void PrintUsers()
-        {
-            foreach (var user in users)
-            {
-                Console.WriteLine($"Name: {user.FirstName}, Email: {user.Email}");
-            }
-        }
     }
 }
