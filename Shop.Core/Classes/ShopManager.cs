@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Shop.Data;
 
 namespace Shop.Classes
 {
     public class ShopManager
     {
+        DapperORM dapper = new DapperORM();
         public void Open(Shop shop)
         {
             try
@@ -34,8 +36,8 @@ namespace Shop.Classes
         public void Open(Shop shop, string openTime)
         {
             shop.IsOpened = true;
-            Console.WriteLine($"Store {shop.Name} is opened at the address {Shop.Location}, " +
-                $"StoreId:{shop.ShopID}, Shop opened at: {openTime}");
+            Console.WriteLine($"Store {shop.Name} is opened at the address {shop.Location}, " +
+                $"StoreId:{shop.ID}, Shop opened at: {openTime}");
         }
 
         public void Close(Shop shop)
@@ -43,7 +45,7 @@ namespace Shop.Classes
             try
             {
                 shop.IsOpened = false;
-                Console.WriteLine($"Store {shop.Name} is closed at the address {Shop.Location}, StoreId:{shop.ShopID}");
+                Console.WriteLine($"Store {shop.Name} is closed at the address {shop.Location}, StoreId:{shop.ID}");
             }
             catch (FormatException ex)
             {
@@ -57,6 +59,128 @@ namespace Shop.Classes
                 //Griding StackTrace
                 throw ex;
             }
+        }
+
+        public void DisplayShopInfo()
+        {
+            Console.Write("Enter shop ID: ");
+            if (int.TryParse(Console.ReadLine(), out int shopId))
+            {
+                var shop = GetShopById(shopId);
+                if (shop != null)
+                {
+                    Console.WriteLine($"ID: {shop.ID}, Name: {shop.Name}, Location: {shop.Location}, IsOpened: {shop.IsOpened}");
+                }
+                else
+                {
+                    Console.WriteLine("Shop not found.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Incorrect ID. Please, try again.");
+            }
+        }
+
+        public Shop GetShopById(int ID)
+        {
+            Shop shop = dapper.ExecReturnScalar<Shop>("GetShopById", new { ShopId = ID });
+            return shop;
+        }
+
+        public void DeleteShopById(int ID)
+        {
+            dapper.ExecWithoutReturn("DeleteShopById", new { ShopId = ID });
+        }
+
+        public void DeleteShopInfo()
+        {
+            Console.Write("Enter shop ID: ");
+            if (int.TryParse(Console.ReadLine(), out int shopId))
+            {
+                DeleteShopById(shopId);
+                Console.WriteLine("Shop deleted");
+            }
+            else
+            {
+                Console.WriteLine("Incorrect ID. Please, try again.");
+            }
+        }
+
+        public void UpdateShop()
+        {
+            Console.Write("Enter shop ID to update: ");
+            if (int.TryParse(Console.ReadLine(), out int shopId))
+            {
+                var existingShop = GetShopById(shopId);
+
+                if (existingShop != null)
+                {
+                    Console.Write("Enter new shop name (press Enter to keep the existing value): ");
+                    string newName = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(newName))
+                    {
+                        newName = existingShop.Name;
+                    }
+
+                    Console.Write("Enter new shop location (press Enter to keep the existing value): ");
+                    string newLocation = Console.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(newLocation))
+                    {
+                        newLocation = existingShop.Location;
+                    }
+
+                    dapper.ExecWithoutReturn("UpdateShopById",
+                        new
+                        {
+                            ShopId = shopId,
+                            Name = newName,
+                            Location = newLocation
+                        });
+
+                    Console.WriteLine("Shop updated successfully");
+                }
+                else
+                {
+                    Console.WriteLine("Shop not found.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Incorrect ID. Please, try again.");
+            }
+        }
+
+        public void CreateShop()
+        {
+            Console.Write("Enter new shop name: ");
+            string name = Console.ReadLine();
+
+            Console.Write("Enter shop location: ");
+            string location = Console.ReadLine();
+
+            Console.Write("Is the shop opened? (true/false): ");
+            bool isOpened;
+            string userInput = Console.ReadLine();
+
+            if (bool.TryParse(userInput, out isOpened))
+            {
+                dapper.ExecWithoutReturn("CreateShop",
+                    new
+                    {
+                        Name = name,
+                        Location = location,
+                        IsOpened = isOpened
+                    });
+
+                Console.WriteLine("Shop created successfully");
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter 'true' or 'false'.");
+            }
+
         }
     }
 }

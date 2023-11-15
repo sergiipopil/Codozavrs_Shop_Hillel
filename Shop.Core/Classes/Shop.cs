@@ -9,12 +9,11 @@ namespace Shop.Classes
 {
     public class Shop
     {
-        public required string Name = "Codozavrs Shop";
-        public const string Location = "Kyiv, Khreshchatyk 54";
-        public readonly int ShopID = 1;
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public string? Location { get; set; }
         public bool IsOpened { get; set; }
 
-        [SetsRequiredMembers]
         public Shop()
         {
             IsOpened = true;
