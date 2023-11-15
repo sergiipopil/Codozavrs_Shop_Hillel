@@ -12,11 +12,11 @@ namespace Shop.Classes.Extensions
         {
             if (shop.IsOpened)
             {
-                return $"Store {shop.Name} is open at {Shop.Location}.";
+                return $"Store {shop.Name} is open at {shop.Location}.";
             }
             else
             {
-                return $"Store {shop.Name} is closed at {Shop.Location}.";
+                return $"Store {shop.Name} is closed at {shop.Location}.";
             }
         }
     }

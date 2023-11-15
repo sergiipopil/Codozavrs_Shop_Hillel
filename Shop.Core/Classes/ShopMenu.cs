@@ -208,7 +208,11 @@ namespace Shop.Classes
                 "Press 1 - Sold item\n" +
                 "Press 2 - Change price item\n" +
                 "Press 3 - Open the shop\n" +
-                "Press 4 - Close the shop\n");
+                "Press 4 - Close the shop\n" +
+                "Press 5 - Get shop info by ID\n" +
+                "Press 6 - Delete shop by ID\n" +
+                "Press 7 - Update shop by ID\n" +
+                "Press 7 - Create shop\n");
 
             Console.Write("Select menu item:");
             bool isCorrectMode = Enum.TryParse(Console.ReadLine(), out SellerMode sellerModeType);
@@ -297,6 +301,18 @@ namespace Shop.Classes
                         break;
                     case SellerMode.CloseShop:
                         shopManager.Close(shop);
+                        break;
+                    case SellerMode.GetShopInfo:
+                        shopManager.DisplayShopInfo();
+                        break;
+                    case SellerMode.DeleteShopInfo:
+                        shopManager.DeleteShopInfo();
+                        break;
+                    case SellerMode.UpdateShopInfo:
+                        shopManager.UpdateShop();
+                        break;
+                    case SellerMode.CreateShop:
+                        shopManager.CreateShop();
                         break;
                 }
                 SellerMenu();
