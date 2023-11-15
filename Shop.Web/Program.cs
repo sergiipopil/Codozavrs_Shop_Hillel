@@ -1,7 +1,7 @@
 using Shop.Web;
 
 var builder = WebApplication.CreateBuilder(args);
-StartUp.InitialConfig();
+StartConfig.InitialConfig();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
