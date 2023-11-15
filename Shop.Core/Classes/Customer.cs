@@ -1,4 +1,5 @@
 ﻿using CustomerLogic.Classes;
+using PhoneNumbers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -21,11 +22,11 @@ namespace Shop.Classes
         public const int storeCard = 123456789;
 
         [SetsRequiredMembers]
-        public Customer(string firstName, string lastName, long numberPhone, decimal cash, CustomerRecord customerRecord)
+        public Customer(string firstName, string lastName, string phoneNumber, decimal cash, CustomerRecord customerRecord)
         {
             this.FirstName = firstName;
             this.LastName = lastName;
-            this.NumberPhone = numberPhone;
+            this.PhoneNumber = phoneNumber;
             this.Cash = cash;
             this.CustomerRecord = customerRecord;
         }

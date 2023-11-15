@@ -13,7 +13,7 @@ namespace CustomerLogic.Classes
             Console.WriteLine($"\nCustomer information:\n");
             customer.GetFullName();
             Console.WriteLine($"Age - {customer.Age}\n" +
-               $"Phone number - {customer.NumberPhone}\n");
+               $"Phone number - {customer.PhoneNumber}\n");
         }
     }
 }
