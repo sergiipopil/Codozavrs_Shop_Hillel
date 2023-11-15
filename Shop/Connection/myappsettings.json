@@ -1,0 +1,5 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=win19.hostsila.org.\\MSSQLSERVER2019,1437;Initial Catalog=CodoZavrs_Shop;User ID=hillel;Password=O4k4@g2s2;Encrypt=True;TrustServerCertificate=True"
+  }
+}

@@ -43,65 +43,7 @@ namespace Shop.Login.Forms.BackLogic.Validation
         }
 
 
-        public static bool GetNewValidPhoneNumber(out string countryCode, out string phoneNumber)
-        {
-            int attempts = MaxAttempts;
-
-            bool isPhoneNumberValid = false;
-            countryCode = string.Empty;
-            phoneNumber = string.Empty;
-
-            do
-            {
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("Please enter your Country Code | For example '+380':");
-                countryCode = Console.ReadLine();
-
-                Console.WriteLine("Please enter your Phone Number | For example '500000000':");
-                string userPhoneNumberNew = Console.ReadLine();
-
-                try
-                {
-                    PhoneNumber number = PhoneNumberUtil.Parse(countryCode + userPhoneNumberNew, null);
-                    string testPhone = countryCode + userPhoneNumberNew;
-                    if (number.NationalNumber.ToString().Length < 7)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Invalid phone number. It's too short. Please try again.");
-                        continue;
-                    }
-
-                    if (File.Exists("UserData.json"))
-                    {
-                        string jsonFromEmail = File.ReadAllText("UserData.json");
-                        List<RegistrationLogic> registrationLogic = JsonConvert.DeserializeObject<List<RegistrationLogic>>(jsonFromEmail);
-
-                        bool phoneExists = registrationLogic.Exists(item => item.PhoneNumber == testPhone);
-
-                        if (phoneExists)
-                        {
-                            throw new EmailAlreadyExistException("Email already exists, please try another.");
-                            break;
-                        }
-
-                        phoneNumber = userPhoneNumberNew;
-                        Console.WriteLine("Phone number: " + phoneNumber);
-                        isPhoneNumberValid = true;
-                        break;
-                    }
-                }
-                catch (NumberParseException e)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Error in parsing number: " + e.Message);
-                    attempts--;
-                    Console.WriteLine("You have " + attempts + " attempt(s) left.");
-                    isPhoneNumberValid = false;
-                }
-            } while (attempts > 0);
-
-            return isPhoneNumberValid;
-        }
+        
 
         public static bool IsValidUserEmail(string userEmail)
         {
