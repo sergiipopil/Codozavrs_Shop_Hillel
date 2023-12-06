@@ -61,12 +61,12 @@ namespace Shop.Classes
             }
         }
 
-        public void DisplayShopInfo()
+        public async Task DisplayShopInfo()
         {
             Console.Write("Enter shop ID: ");
             if (int.TryParse(Console.ReadLine(), out int shopId))
             {
-                var shop = GetShopById(shopId);
+                var shop = await GetShopById(shopId);
                 if (shop != null)
                 {
                     Console.WriteLine($"ID: {shop.ID}, Name: {shop.Name}, Location: {shop.Location}, IsOpened: {shop.IsOpened}");
@@ -82,15 +82,15 @@ namespace Shop.Classes
             }
         }
 
-        public Shop GetShopById(int ID)
+        public async Task<Shop> GetShopById(int ID)
         {
-            Shop shop = dapper.ExecReturnScalar<Shop>("GetShopById", new { ShopId = ID });
+            Shop shop = await dapper.ExecReturnObject<Shop>("GetShopById", new { ShopId = ID });
             return shop;
         }
 
-        public void DeleteShopById(int ID)
+        public async Task DeleteShopById(int ID)
         {
-            dapper.ExecWithoutReturn("DeleteShopById", new { ShopId = ID });
+            await dapper.ExecWithoutReturn("DeleteShopById", new { ShopId = ID });
         }
 
         public void DeleteShopInfo()
@@ -107,12 +107,12 @@ namespace Shop.Classes
             }
         }
 
-        public void UpdateShop()
+        public async Task UpdateShop()
         {
             Console.Write("Enter shop ID to update: ");
             if (int.TryParse(Console.ReadLine(), out int shopId))
             {
-                var existingShop = GetShopById(shopId);
+                var existingShop = await GetShopById(shopId);
 
                 if (existingShop != null)
                 {
@@ -131,7 +131,7 @@ namespace Shop.Classes
                         newLocation = existingShop.Location;
                     }
 
-                    dapper.ExecWithoutReturn("UpdateShopById",
+                    await dapper.ExecWithoutReturn("UpdateShopById",
                         new
                         {
                             ShopId = shopId,
@@ -152,7 +152,7 @@ namespace Shop.Classes
             }
         }
 
-        public void CreateShop()
+        public async Task CreateShop()
         {
             Console.Write("Enter new shop name: ");
             string name = Console.ReadLine();
@@ -166,7 +166,7 @@ namespace Shop.Classes
 
             if (bool.TryParse(userInput, out isOpened))
             {
-                dapper.ExecWithoutReturn("CreateShop",
+                await dapper.ExecWithoutReturn("CreateShop",
                     new
                     {
                         Name = name,
