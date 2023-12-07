@@ -16,9 +16,9 @@ namespace ShopWeb.Controllers
             _logger = logger;
         }
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            List<ProductModel> products = dapper.ExecReturnList<ProductModel>("GetAllProducts", null).ToList();
+            var products = await dapper.ExecReturnList<ProductModel>("GetAllProducts", null);
             return View(products);
         }
         [HttpGet]
@@ -27,7 +27,7 @@ namespace ShopWeb.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Create(ProductModel product)
+        public async Task<IActionResult> Create(ProductModel product)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace ShopWeb.Controllers
                 ModelState.Remove("Expiration");
                 if (ModelState.IsValid)
                 {
-                    dapper.ExecWithoutReturn("CreateProduct",
+                    await dapper.ExecWithoutReturn("CreateProduct",
                         new
                         {
                             Title = product.Title,
@@ -62,12 +62,12 @@ namespace ShopWeb.Controllers
             }
         }
         [HttpGet]
-        public IActionResult Edit(int Id)
+        public async Task<IActionResult> Edit(int Id)
         {
             try
             {
                 ProductModel product =
-                    dapper.ExecReturnScalar<ProductModel>("GetProductById", new { Id = Id });
+                    await dapper.ExecReturnObject<ProductModel>("GetProductById", new { Id = Id });
                 if (product != null)
                 {
                     return View(product);
@@ -86,7 +86,7 @@ namespace ShopWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(ProductModel product)
+        public async Task<IActionResult> Edit(ProductModel product)
         {
             try
             {
@@ -95,7 +95,7 @@ namespace ShopWeb.Controllers
                 ModelState.Remove("Expiration");
                 if (ModelState.IsValid)
                 {
-                    dapper.ExecWithoutReturn("UpdateProductById",
+                    await dapper.ExecWithoutReturn("UpdateProductById",
                         new
                         {
                             Id = product.Id,
@@ -123,11 +123,11 @@ namespace ShopWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult Delete(int Id)
+        public async Task<IActionResult> Delete(int Id)
         {
             try
             {
-                dapper.ExecWithoutReturn("DeleteProductById",
+                await dapper.ExecWithoutReturn("DeleteProductById",
                     new
                     {
                         Id = Id
