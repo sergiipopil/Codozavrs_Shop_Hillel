@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Dapper;
+using Shop.Web;
 
 namespace Shop.Classes
 {
@@ -197,7 +198,7 @@ namespace Shop.Classes
             }
         }
 
-        public void CreateCustomer(Customer customer, string connectionStr)
+        async public Task CreateCustomerAsync(Customer customer, string connectionStr)
         {
             using (var connection = new SqlConnection(connectionStr))
             {
@@ -213,22 +214,24 @@ namespace Shop.Classes
 
                 var sql = $@"EXEC hillel.CreateCustomer @FirstName = {parameters.FirstName}, @LastName={parameters.LastName}, @PhoneNumber={parameters.PhoneNumber},@BirthDay={parameters.BirthDay},@Age={parameters.Age},@Cash={parameters.Cash} ";
 
-                var result = connection.Execute(sql, parameters);
+                var result =connection.Execute(sql, parameters);
+                
             }
         }
 
-        public void DeleteCustomer(int Id, string connectionStr)
+        async public Task DeleteCustomerAsync(int Id, string connectionStr)
         {
             using (var connection = new SqlConnection(connectionStr))
             {
                 var sql = $@"EXEC hillel.DeleteCustomerById @Id={Id}";
                 var result = connection.Query(sql);
+                
             }
         }
 
-        public void UpDateCustomerById(string connectionStr, int id, string firstName, string lastName, string phoneNumber, DateTime birthDay, int? age, int? cash)
+        public async Task UpDateCustomerByIdAsync(int id, string firstName, string lastName, string phoneNumber, DateTime birthDay, int? age, int? cash)
         {
-            using (var connection = new SqlConnection(connectionStr))
+            using (var connection = StartConfig._dbContext.CreateRemoteConnection())
             {
                 var parameters = new Dictionary<string, object>
                 {

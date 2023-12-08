@@ -21,11 +21,11 @@ namespace Shop.Data.Migrations
             var sql = @"IF NOT EXISTS 
                        ( 
                         SELECT 1 FROM INFORMATION_SCHEMA.TABLES
-                         WHERE TABLE_SCHEMA = 'dbo'
+                         WHERE TABLE_SCHEMA = 'hillel'
                             AND TABLE_NAME = 'Customer'
                        )
                         BEGIN
-                            CREATE TABLE [dbo].Customer
+                            CREATE TABLE [hillel].Customer
                             (
                                 Id int IDENTITY (1,1) PRIMARY KEY not null,
 	                            FirstName varchar (15) null,

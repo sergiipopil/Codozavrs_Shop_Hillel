@@ -320,6 +320,13 @@ namespace Shop.Classes
         }
         private void BuyerMenu()
         {
+
+            customerManager.UpDateCustomerByIdAsync(14, null, "Bekker", null, new DateTime(2000, 12, 12), 23, null);
+
+
+
+
+
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Buyer menu:\n\n" +
                 "Press 0 - Return to Main Menu\n" +
