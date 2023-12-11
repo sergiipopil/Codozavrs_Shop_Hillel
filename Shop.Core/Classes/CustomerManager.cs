@@ -183,13 +183,13 @@ namespace Shop.Classes
             }
         }
 
-        public void GetCustomerById(int Id, string connectionStr)
+        async public Task GetCustomerByIdAsync(int Id)
         {
 
-            using (var connection = new SqlConnection(connectionStr))
+            using (var connection = StartConfig._dbContext.CreateRemoteConnection())
             {
                 var sql = $@"EXEC hillel.GetCustomerById @Id={Id}";
-                var result = connection.Query<Customer>(sql);
+                var result = await connection.QueryAsync<Customer>(sql);
                 foreach (var customer in result)
                 {
                     Console.WriteLine($"Id: {customer.Id},Firstname: {customer.FirstName}, Lastname: {customer.LastName}");
@@ -198,9 +198,9 @@ namespace Shop.Classes
             }
         }
 
-        async public Task CreateCustomerAsync(Customer customer, string connectionStr)
+        async public Task CreateCustomerAsync(Customer customer)
         {
-            using (var connection = new SqlConnection(connectionStr))
+            using (var connection = StartConfig._dbContext.CreateRemoteConnection())
             {
                 var parameters = new
                 {
@@ -214,17 +214,17 @@ namespace Shop.Classes
 
                 var sql = $@"EXEC hillel.CreateCustomer @FirstName = {parameters.FirstName}, @LastName={parameters.LastName}, @PhoneNumber={parameters.PhoneNumber},@BirthDay={parameters.BirthDay},@Age={parameters.Age},@Cash={parameters.Cash} ";
 
-                var result =connection.Execute(sql, parameters);
+                var result =connection.ExecuteAsync(sql, parameters);
                 
             }
         }
 
-        async public Task DeleteCustomerAsync(int Id, string connectionStr)
+        async public Task DeleteCustomerAsync(int Id)
         {
-            using (var connection = new SqlConnection(connectionStr))
+            using (var connection = StartConfig._dbContext.CreateRemoteConnection())
             {
                 var sql = $@"EXEC hillel.DeleteCustomerById @Id={Id}";
-                var result = connection.Query(sql);
+                var result = connection.QueryAsync(sql);
                 
             }
         }
@@ -276,7 +276,7 @@ namespace Shop.Classes
                     sql += ", @Cash = @Cash";
                 }
 
-                connection.Execute(sql, parameters);
+                connection.ExecuteAsync(sql, parameters);
             }
         }
 

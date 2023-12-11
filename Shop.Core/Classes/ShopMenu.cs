@@ -320,11 +320,8 @@ namespace Shop.Classes
         }
         private void BuyerMenu()
         {
-
-            customerManager.UpDateCustomerByIdAsync(14, null, "Bekker", null, new DateTime(2000, 12, 12), 23, null);
-
-
-
+            //method testing
+            //customerManager.UpDateCustomerByIdAsync(14, null, "Bekker", null, new DateTime(2000, 12, 12), 23, null);
 
 
             Console.ForegroundColor = ConsoleColor.Yellow;
