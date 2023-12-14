@@ -8,7 +8,7 @@ using Shop.Core.Classes;
 
 namespace Shop.Classes
 {
-    public class ProductManager:ProductManagerBase<ProductBase>, IProductManager
+    public class ProductManager : ProductManagerBase<ProductBase>, IProductManager
     {
         public List<Product> ProductList { get; set; }
         public void ShowProductsList()
@@ -52,7 +52,7 @@ namespace Shop.Classes
                 Console.WriteLine($"We don`t have product with id {id}");
             }
         }
-        
+
         public void AddNewProduct(Product product)
         {
             int id = ProductList.Max(x => x.Id);
@@ -63,18 +63,19 @@ namespace Shop.Classes
         {
             return ProductList.FirstOrDefault(x => x.Id == productId);
         }
-        public void DeleteProduct(int productId)
+        public bool DeleteProduct(int productId)
         {
             if (ProductList != null && ProductList.Count > 0)
             {
                 Product deletedProduct = ProductList.FirstOrDefault(x => x.Id == productId);
                 if (deletedProduct != null)
                 {
-                    ProductList.Remove(deletedProduct);
+                    return ProductList.Remove(deletedProduct);
                 }
             }
+            return false;
         }
-        public void DeleteProduct(string title)
+        public bool DeleteProduct(string title)
         {
             if (ProductList != null && ProductList.Count > 0)
             {
@@ -84,11 +85,18 @@ namespace Shop.Classes
                     foreach (var item in deletedProducts)
                     {
                         ProductList.Remove(item);
+
+                        if (!deletedProducts.Any())
+                        {
+                            return true;
+                        }
                     }
+
                 }
             }
+            return false;
         }
-        public void DeleteExpirationProducts()
+        public bool DeleteExpirationProducts()
         {
             if (ProductList != null && ProductList.Count > 0)
             {
@@ -97,10 +105,11 @@ namespace Shop.Classes
                 {
                     foreach (var item in deletedProducts)
                     {
-                        ProductList.Remove(item);
+                        return ProductList.Remove(item);
                     }
                 }
             }
+            return false;
         }
     }
 }
