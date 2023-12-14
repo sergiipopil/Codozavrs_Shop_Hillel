@@ -12,8 +12,8 @@ namespace Shop.Classes
         public void GetProductDetail(string title);
         public void GetProductDetail(int id);
         public void AddNewProduct(Product product);
-        public void DeleteProduct(int productId);
-        public void DeleteProduct(string title);
-        public void DeleteExpirationProducts();
+        public bool DeleteProduct(int productId);
+        public bool DeleteProduct(string title);
+        public bool DeleteExpirationProducts();
     }
 }
