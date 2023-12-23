@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Shop.Classes
 {
-    internal class Customer : CustomerAbstract
+    public class Customer : CustomerAbstract
     {
         private decimal _cash;
         public decimal Cash
@@ -22,27 +22,26 @@ namespace Shop.Classes
         public const int storeCard = 123456789;
 
         [SetsRequiredMembers]
-        public Customer(string firstName, string lastName, string phoneNumber, decimal cash, CustomerRecord customerRecord)
+        public Customer(string firstName, string lastName, string phoneNumber, decimal cash)
         {
             this.FirstName = firstName;
             this.LastName = lastName;
             this.PhoneNumber = phoneNumber;
             this.Cash = cash;
-            this.CustomerRecord = customerRecord;
         }
         private int age;
-        public override int Age { get { return age; } }
+        public override int Age { get { return age; } set { age = value; } }
         CustomerRecord CustomerRecord { get; }
 
         public override int GetAge()
         {
-            DateTime today = DateTime.Today;
-            age = today.Year - CustomerRecord.BirthDay.Year;
+            DateTime today = new DateTime(2023, 12, 21);
+            age = today.Year - BirthDay.Year;
             return age;
         }
-        public override string CustomerAdult()
+        public override bool CustomerAdult()
         {
-            return Age < 18 ? "You aren`t adult!" : "You are adult!";
+            return Age < 18 ? false : true;
         }
 
         public new void GetFullName()
