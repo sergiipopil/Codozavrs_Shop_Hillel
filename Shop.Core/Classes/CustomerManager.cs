@@ -10,7 +10,7 @@ using Shop.Web;
 
 namespace Shop.Classes
 {
-    internal class CustomerManager : CustomerManagerAbstract<CustomerAbstract>
+    public class CustomerManager : CustomerManagerAbstract<CustomerAbstract>
     {
         Basket basket = new Basket();
 
@@ -138,6 +138,13 @@ namespace Shop.Classes
             {
                 Console.WriteLine("Basket doesn't have this product!");
             }
+        }
+
+        public int GetCountItemById(int Id)
+        {
+            var productsInBasket = basket.BasketItems.FirstOrDefault(x => x.Id == Id);
+            return productsInBasket.Count;
+
         }
 
 

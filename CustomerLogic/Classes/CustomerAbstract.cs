@@ -18,12 +18,12 @@ namespace CustomerLogic.Classes
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
-        public abstract int Age { get; }
+        public abstract int Age { get; set; }
         public DateTime BirthDay { get; set; }
 
-        public virtual string CustomerAdult()
+        public virtual bool CustomerAdult()
         {
-            return "You aren`t adult!";
+            return true;
         }
         public void GetFullName()
         {
