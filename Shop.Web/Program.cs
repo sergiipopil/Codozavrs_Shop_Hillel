@@ -20,8 +20,7 @@ else
 {
     app.UseDeveloperExceptionPage();
 }
-
-
+app.UseMiddleware<MyCustomMiddleware>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
