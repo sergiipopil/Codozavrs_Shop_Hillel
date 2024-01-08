@@ -2,24 +2,35 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Shop.Data;
-using Shop.Web;
+using Shop.Business.Classes;
 
 namespace ShopWeb.Controllers
 {
     public class HomeController : Controller
     {
-        DapperORM dapper = new DapperORM();
+        private readonly ProductManagement _productManagement;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
+            _productManagement = new ProductManagement();
         }
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var products = await dapper.ExecReturnList<ProductModel>("GetAllProducts", null);
-            return View(products);
+            var productsDto = await _productManagement.GetAllProducts();
+            IList<ProductModel> productList = productsDto.Select(x => new ProductModel()
+            {
+                Weight = x.Weight,
+                Count = x.Count,
+                Expiration = x.Expiration,
+                Id = x.Id,
+                Price = x.Price,
+                Production = x.Production,
+                Title = x.Title
+            }).ToList();
+            return View(productList);
         }
         [HttpGet]
         public IActionResult Create()
@@ -36,16 +47,17 @@ namespace ShopWeb.Controllers
                 ModelState.Remove("Expiration");
                 if (ModelState.IsValid)
                 {
-                    await dapper.ExecWithoutReturn("CreateProduct",
-                        new
-                        {
-                            Title = product.Title,
-                            Price = product.Price,
-                            Count = product.Count,
-                            Weight = product.Weight,
-                            Production = product.Production,
-                            Expiration = product.Expiration
-                        });
+                    ProductDto productDto = new ProductDto()
+                    {
+                        Count = product.Count,
+                        Expiration = product.Expiration,
+                        Id = product.Id,
+                        Price = product.Price,
+                        Production = product.Production,
+                        Title = product.Title,
+                        Weight = product.Weight
+                    };
+                    _productManagement.AddProduct(productDto);
                     TempData["successMessage"] = "Product created successfully";
                     return RedirectToAction("Index");
                 }
@@ -66,8 +78,18 @@ namespace ShopWeb.Controllers
         {
             try
             {
-                ProductModel product =
-                    await dapper.ExecReturnObject<ProductModel>("GetProductById", new { Id = Id });
+                ProductDto productDto = await _productManagement.GetProductById(Id);
+                ProductModel product = new ProductModel()
+                {
+                    Weight = productDto.Weight,
+                    Count = productDto.Count,
+                    Expiration = productDto.Expiration,
+                    Id = productDto.Id,
+                    Price = productDto.Price,
+                    Production = productDto.Production,
+                    Title = productDto.Title
+                };
+
                 if (product != null)
                 {
                     return View(product);
@@ -80,7 +102,7 @@ namespace ShopWeb.Controllers
             }
             catch (Exception ex)
             {
-                TempData["errorMessage"]=ex.Message;
+                TempData["errorMessage"] = ex.Message;
                 return RedirectToAction("Index");
             }
         }
@@ -95,17 +117,17 @@ namespace ShopWeb.Controllers
                 ModelState.Remove("Expiration");
                 if (ModelState.IsValid)
                 {
-                    await dapper.ExecWithoutReturn("UpdateProductById",
-                        new
-                        {
-                            Id = product.Id,
-                            Title = product.Title,
-                            Price = product.Price,
-                            Count = product.Count,
-                            Weight = product.Weight,
-                            Production = product.Production,
-                            Expiration = product.Expiration,
-                        });
+                    ProductDto productDto = new ProductDto()
+                    {
+                        Count = product.Count,
+                        Expiration = product.Expiration,
+                        Id = product.Id,
+                        Price = product.Price,
+                        Production = product.Production,
+                        Title = product.Title,
+                        Weight = product.Weight
+                    };
+                    _productManagement.EditProduct(productDto);
                     TempData["successMessage"] = "Product updated successfully";
                     return RedirectToAction("Index");
                 }
@@ -127,11 +149,7 @@ namespace ShopWeb.Controllers
         {
             try
             {
-                await dapper.ExecWithoutReturn("DeleteProductById",
-                    new
-                    {
-                        Id = Id
-                    });
+                _productManagement.DeleteProduct(Id);
                 TempData["successMessage"] = "Product deleted successfully";
                 return RedirectToAction("Index");
 
